@@ -11,7 +11,7 @@ using University.Services.Model;
 
 namespace University.Services.Controllers
 {
-   
+   //controller
     public class UserRegisterController : ControllerBase
     {
         private readonly IUserRegisterActions _userRegisterActions;
