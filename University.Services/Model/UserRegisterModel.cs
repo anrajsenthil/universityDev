@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace University.Services.Model
 {
-    //model
+    //model created
     public class UserRegisterModel
     {
         public string Username { get; set; }
