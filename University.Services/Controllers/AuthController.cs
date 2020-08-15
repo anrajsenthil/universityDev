@@ -11,7 +11,7 @@ using University.Services.Model;
 
 namespace University.Services.Controllers
 {
-    //controller 
+     
     public class AuthController : ControllerBase
     {
         public readonly UserManager<IdentityUser> _userManager;
