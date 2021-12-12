@@ -3,11 +3,19 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using University.Services.Model;
+
+
+using AutoMapper;
+
+using University.Business.Interface;
+using University.Domain.Entities;
+
 
 namespace University.Services.Controllers
 {
@@ -17,15 +25,24 @@ namespace University.Services.Controllers
         public readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<IdentityUser> userManager, IConfiguration configuration)
+        private readonly IUserRegisterActions _userRegisterActions;
+        private readonly IMapper _mapper;
+
+     //   
+
+        public AuthController(UserManager<IdentityUser> userManager, IConfiguration configuration, IUserRegisterActions userRegisterActions, IMapper mapper)
         {
             _userManager = userManager;
             _configuration = configuration;
+
+            _userRegisterActions = userRegisterActions;
+            _mapper = mapper;
         }
        [Route("register")]
        [HttpPost]
-        public async Task<ActionResult> InsertUser([FromBody] UserRegisterModel model)
+       public async Task<ActionResult> InsertUser([FromBody] UserRegisterModel model)
         {
+         
             var user = new IdentityUser
             {
                 Email = model.EmailId,
@@ -33,25 +50,41 @@ namespace University.Services.Controllers
                // UserType=model.UserType,
                 SecurityStamp = Guid.NewGuid().ToString()
             };
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if(result.Succeeded)
+            try
             {
-                if (model.UserType == "Staff")
+               var Emodel= _mapper.Map<UserRegister>(model);
+                await _userRegisterActions.InsertStudentAysc(Emodel);
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "Staff");
-                }
-                else if (model.UserType == "Student")
-                {
-                    await _userManager.AddToRoleAsync(user, "Student");
+                    if (model.UserType == "Staff")
+                    {
+                        await _userManager.AddToRoleAsync(user, "Staff");
+                    }
+                    else if (model.UserType == "Student")
+                    {
+                        await _userManager.AddToRoleAsync(user, "Student");
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, "Admin");
+                    }
+                    return Ok(new { Username = user.UserName });
                 }
                 else
                 {
-                    await _userManager.AddToRoleAsync(user, "Admin");
+                    return Ok(new { Username = result.Errors });
                 }
-                    return Ok(new {Username=user.UserName });
+            }
+            catch(Exception ex)
+            {
+                return Ok(new { ex.InnerException });
+
             }
 
-            return Ok(new {result.Errors });
+
+
+          
         }
         [Route("login")]
         [HttpPost]
@@ -83,6 +116,16 @@ namespace University.Services.Controllers
             });
             
         }
-       
+
+        [Route("stureg")]
+        [HttpPost]
+        public async Task<ActionResult> studentRegister([FromBody]UserRegisterModel userRegisterModel)
+        {
+            await _userRegisterActions.InsertStudentAysc(_mapper.Map<UserRegisterModel, UserRegister>(userRegisterModel));
+
+            return Ok(new { Username = userRegisterModel.FullName });
+        }
+
+
     }
 }

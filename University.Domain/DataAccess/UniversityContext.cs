@@ -16,6 +16,10 @@ namespace University.Domain.DataAccess
         public DbSet<Student> Students { get; set; }
 
         public DbSet<UserRegister> UserRegisters { get; set; }
+
+        public DbSet<Courses> coursesLst { get; set; }
+
+        public DbSet<Country> countryLst { get; set; }
         public int IdentityRole { get; private set; }
 
        // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -35,6 +39,18 @@ namespace University.Domain.DataAccess
             {
                 student.ToTable("Student");
                 student.HasKey("StudentId");
+
+            });
+            modelBuilder.Entity<Courses>(courses =>
+            {
+                courses.ToTable("Courses");
+                courses.HasKey("Courseid");
+
+            });
+            modelBuilder.Entity<Country>(country =>
+            {
+                country.ToTable("Country");
+                country.HasKey("Countryid");
 
             });
             modelBuilder.Entity<IdentityRole>().HasData(

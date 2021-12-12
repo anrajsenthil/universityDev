@@ -21,14 +21,15 @@ namespace University.Services.Controllers
             _userRegisterActions = userRegisterActions;
             _mapper = mapper;
         }
-        
-       
-        [Route("Insert")]
+
+
+        [Route("stureg")]
         [HttpPost]
-        public void Insert([FromBody]UserRegisterModel userRegisterModel)
+        public async Task<ActionResult> studentRegister([FromBody] UserRegisterModel userRegisterModel)
         {
-           // _userRegisterActions.Insert(_mapper.Map<UserRegisterModel, UserRegister>(userRegisterModel));
-           // return Ok("User Register Sucessfully");
+            await _userRegisterActions.InsertStudentAysc(_mapper.Map<UserRegisterModel, UserRegister>(userRegisterModel));
+
+            return Ok(new { Username = userRegisterModel.FullName });
         }
     }
    

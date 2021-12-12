@@ -13,11 +13,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using University.Services.Automapper;
+using System;
+using Azure.Storage.Blobs;
 
 namespace University.Services
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -35,6 +38,16 @@ namespace University.Services
                 {
                     option.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
                 });
+            //services.AddCors(options =>
+            //{
+              //  options.AddPolicy(MyAllowSpecificOrigins,
+               // builder =>
+                //{
+                  //  builder.WithOrigins("http://localhost:4200")
+                    //.AllowAnyHeader()
+                    //.AllowAnyMethod();
+                //});
+            //});
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddIdentity<IdentityUser, IdentityRole>(
@@ -72,7 +85,10 @@ namespace University.Services
             services.AddTransient<IStudentRepository, StudentRepository>();
             // services.AddTransient<IStudentRetriever, StudentRetriever>();
             services.AddTransient<IUserRegistrationRepository, UserRegistrationRepository>();
-
+            services.AddTransient<IUserRegisterActions, UserRegisterActions>();
+            services.AddSingleton(IServiceProvider =>
+            new BlobServiceClient(connectionString: Configuration.GetValue<string>(key: "AzureBlobStorageConnectionString")));
+            services.AddSingleton<IBlobService, BlobService>();
             var config = new AutoMapper.MapperConfiguration(cfg =>
             { 
                   cfg.AddProfile(new AutoMapperProfile());
@@ -95,8 +111,13 @@ namespace University.Services
             {
                 app.UseHsts();
             }
-            //app.UseCors(options => options.AllowAnyOrigin());
-           //app.UseCors(options => options.WithOrigins("https://localhost:44392"));
+            app.UseCors(builder =>
+            {
+                builder.WithOrigins("http://localhost:4200");
+                builder.AllowAnyMethod();
+                builder.AllowAnyHeader();
+
+            });
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseMvc();

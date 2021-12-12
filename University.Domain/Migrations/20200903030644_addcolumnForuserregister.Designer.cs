@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using University.Domain.DataAccess;
 
 namespace University.Domain.Migrations
 {
     [DbContext(typeof(UniversityContext))]
-    partial class UniversityContextModelSnapshot : ModelSnapshot
+    [Migration("20200903030644_addcolumnForuserregister")]
+    partial class addcolumnForuserregister
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -198,32 +200,6 @@ namespace University.Domain.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("University.Domain.Entities.Country", b =>
-                {
-                    b.Property<int>("Countryid")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CountryName");
-
-                    b.HasKey("Countryid");
-
-                    b.ToTable("Country");
-                });
-
-            modelBuilder.Entity("University.Domain.Entities.Courses", b =>
-                {
-                    b.Property<int>("Courseid")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Coursename");
-
-                    b.HasKey("Courseid");
-
-                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("University.Domain.Entities.Student", b =>

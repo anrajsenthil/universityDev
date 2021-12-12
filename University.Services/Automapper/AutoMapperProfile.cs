@@ -12,7 +12,7 @@ namespace University.Services.Automapper
     {
         public AutoMapperProfile()
         {
-            CreateMap<UserRegister, UserRegisterModel>().ReverseMap();
+            CreateMap<UserRegisterModel, UserRegister>();
         }
     }
 }
